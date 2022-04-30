@@ -107,8 +107,17 @@ def main(message):
     elif message.text == "Напольное покрытие":
             bot.send_message(message.chat.id, " В разработке ")
     elif message.text == "Керамика":
-            msg = bot.send_message(message.chat.id, "Введите артикул :")
-            bot.register_next_step_handler(msg, art_result)
+            markup = types.InlineKeyboardMarkup()
+            colle = types.InlineKeyboardButton (text='Поиск по Коллекциям', callback_data='Коллекциям')
+            art = types.InlineKeyboardButton (text='Поиск по Артикулам',callback_data='Артикул')
+            markup.add(art,colle)
+            bot.send_message(message.chat.id, "Коллекция или Артикул?",reply_markup=markup)
+    elif message.text == "Коллекциям":
+        msg = bot.send_message(message.chat.id, "Введите название колекции")
+        bot.register_next_step_handler(msg, colle_input)
+    elif message.text == "Артикул":
+        msg = bot.send_message(message.chat.id, "Введите артикул")
+        bot.register_next_step_handler(msg, art_input)
     elif message.text == "Назад":
         markup = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
         peson = types.KeyboardButton('Для Персонала')
@@ -145,6 +154,12 @@ def main(message):
         msg = bot.send_message(admin_id, f"Пользователь просит авторизации : {message.chat.id}   {message.from_user.first_name} {message.from_user.last_name}", parse_mode='html', reply_markup=markup)
         bot.register_next_step_handler(msg,user_reg)
 
+def colle_input(message):
+    msg = bot.send_message(message.chat.id, "Введите артикул :")
+    bot.register_next_step_handler(msg, art_result)
+def art_input(message):
+    msg = bot.send_message(message.chat.id, "Введите артикул :")
+    bot.register_next_step_handler(msg, art_result)
 def art_result(message):
         art = message.text
         xl = openpyxl.open(filename='ПРАЙС_ВОГ-розница.xlsx')
@@ -201,3 +216,11 @@ def user_reg(message):
 
 
 bot.polling()
+
+
+#some_strings = ["col1", "col2", "row2"]
+#button_list = [[KeyboardButton(ss)] for ss in some_strings]
+# сборка клавиатуры из кнопок `KeyboardButton`
+#reply_markup = ReplyKeyboardMarkup(build_menu(button_list, n_cols=2))
+# отправка клавиатуры в чат
+#bot.send_message(chat_id=chat_id, text="Меню из двух столбцов", reply_markup=reply_markup)
